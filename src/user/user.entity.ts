@@ -25,6 +25,8 @@ export class User {
             case 'doctorate':
             case 'доктор':
                 return 'DOCTORATE';
+            default:
+                undefined;
         }
     }
 
@@ -37,6 +39,8 @@ export class User {
             case 'regular':
             case 'редовно':
                 return 'REGULAR';
+            default:
+                undefined;
         }
     }
 

@@ -1,11 +1,24 @@
-import { Injectable } from '@nestjs/common';
+import {
+    ConflictException,
+    forwardRef,
+    Inject,
+    Injectable,
+    InternalServerErrorException,
+    NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './user.entity';
+import { ProjectService } from '../project/project.service';
 
 @Injectable()
 export class UserService {
     constructor(
+        @Inject(forwardRef(() => ProjectService))
+        private readonly projectService: ProjectService,
+
         @InjectRepository(User)
         private userRepository: Repository<User>,
     ) {}
@@ -14,8 +27,12 @@ export class UserService {
         return this.userRepository.find();
     }
 
-    findOneById(id: string): Promise<User> {
+    findOneById(id: number): Promise<User> {
         return this.userRepository.findOne(id);
+    }
+
+    findAllByIds(ids: number[]): Promise<User[]> {
+        return this.userRepository.findByIds(ids);
     }
 
     findAllByFirstName(firstName: string): Promise<User[]> {
@@ -54,6 +71,50 @@ export class UserService {
         return this.userRepository.find({
             where: { educationType: User.getEducationType(educationType) },
         });
+    }
+
+    async create(data: CreateUserDto) {
+        const newUser = new User();
+        const { projectsIds, ...rest } = data;
+        rest.educationForm = User.getEducationForm(rest.educationForm);
+        rest.educationType = User.getEducationType(rest.educationType);
+        Object.assign(newUser, rest);
+
+        if (projectsIds) {
+            newUser.projects = await this.projectService.findAllByIds(
+                projectsIds,
+            );
+        }
+
+        try {
+            return this.userRepository.save(newUser);
+        } catch (error) {
+            if (error.code === 'ER_DUP_ENTRY') {
+                throw new ConflictException('This user already exists');
+            }
+            throw new InternalServerErrorException(error);
+        }
+    }
+
+    async update(id: number, data: UpdateUserDto) {
+        const user = await this.userRepository.findOne(id);
+        const { projectsIds, ...rest } = data;
+
+        if (user) {
+            rest.educationForm = User.getEducationForm(rest.educationForm);
+            rest.educationType = User.getEducationType(rest.educationType);
+            Object.assign(user, rest);
+
+            if (projectsIds) {
+                user.projects = await this.projectService.findAllByIds(
+                    projectsIds,
+                );
+            }
+
+            return this.userRepository.save(user);
+        } else {
+            throw new NotFoundException('User Not Found.');
+        }
     }
 
     async remove(id: string): Promise<void> {
