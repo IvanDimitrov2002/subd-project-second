@@ -4,7 +4,7 @@ import { UpdateConsultationDto } from './dto/update-consultation.dto';
 import { ConsultationService } from './consultation.service';
 import { Consultation } from './consultation.entity';
 
-@Controller('consultation')
+@Controller('consultations')
 export class ConsultationController {
     constructor(private readonly consultationService: ConsultationService) {}
 

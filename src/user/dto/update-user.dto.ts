@@ -4,7 +4,7 @@ export class UpdateUserDto {
     firstName?: string;
     middleName?: string;
     lastName?: string;
-    starYear?: number;
+    startYear?: number;
     endYear?: number;
     group?: number;
     certifiedSemester?: number;

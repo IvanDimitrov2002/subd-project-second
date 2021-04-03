@@ -53,6 +53,16 @@ export class UserService {
         });
     }
 
+    async findAllByClassifier(classifier: string): Promise<User[]> {
+        const users = await this.userRepository.find();
+        return users.filter(
+            (user) =>
+                user.projects.filter(
+                    (project) => project.task.classifier === classifier,
+                ).length > 0,
+        );
+    }
+
     async findAllBySchoolYear(schoolYear: string): Promise<User[]> {
         const years = schoolYear.split('/');
         const users = await this.userRepository.find({

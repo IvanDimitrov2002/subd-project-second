@@ -4,7 +4,7 @@ import { UpdateGradeDto } from './dto/update-grade.dto';
 import { Grade } from './grade.entity';
 import { GradeService } from './grade.service';
 
-@Controller('grade')
+@Controller('grades')
 export class GradeController {
     constructor(private readonly gradeService: GradeService) {}
 

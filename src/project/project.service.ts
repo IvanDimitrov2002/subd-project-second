@@ -45,10 +45,11 @@ export class ProjectService {
         return this.projectRepository.findByIds(ids);
     }
 
-    findAllByClassifier(classifier: string): Promise<Project[]> {
-        return this.projectRepository.find({
-            where: { task: { classifier: classifier } },
-        });
+    async findAllByClassifier(classifier: string): Promise<Project[]> {
+        const projects = await this.projectRepository.find();
+        return projects.filter(
+            (project) => project.task.classifier === classifier,
+        );
     }
 
     async create(data: CreateProjectDto): Promise<Project> {

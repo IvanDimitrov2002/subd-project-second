@@ -1,5 +1,7 @@
+import { mean, round } from 'lodash';
 import { User } from 'src/user/user.entity';
 import {
+    AfterLoad,
     Column,
     CreateDateColumn,
     Entity,
@@ -16,6 +18,16 @@ import { Task } from './task.entity';
 
 @Entity()
 export class Project {
+    @AfterLoad()
+    calculateGrades = async () => {
+        if (!!this.grades) {
+            this.avgGrade = parseFloat(
+                mean(this.grades.map((grade) => grade.grade)).toFixed(2),
+            );
+            this.finalGrade = round(this.avgGrade);
+        }
+    };
+
     @CreateDateColumn()
     createdAt: Date;
 

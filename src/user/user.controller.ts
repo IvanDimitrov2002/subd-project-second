@@ -70,6 +70,15 @@ export class UserController {
                     'id',
                 );
             }
+            if (query.classifier) {
+                users = intersectionBy(
+                    users,
+                    await this.userService.findAllByClassifier(
+                        query.classifier,
+                    ),
+                    'id',
+                );
+            }
         }
         return users;
     }

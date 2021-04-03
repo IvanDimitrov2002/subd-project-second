@@ -6,4 +6,5 @@ export class UserQueryDto {
     schoolYear?: string;
     group?: number;
     educationType?: string;
+    classifier?: string;
 }

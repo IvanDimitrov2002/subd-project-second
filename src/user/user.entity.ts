@@ -63,7 +63,7 @@ export class User {
     lastName: string;
 
     @Column()
-    starYear: number;
+    startYear: number;
 
     @Column()
     endYear: number;
