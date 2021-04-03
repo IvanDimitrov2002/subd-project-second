@@ -6,12 +6,17 @@ import { User } from './user.entity';
 import { UserService } from './user.service';
 import { intersectionBy } from 'lodash';
 
+interface UserData {
+    data: User[];
+    entries: number;
+}
+
 @Controller('users')
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
     @Get()
-    async findAllByCriteria(@Query() query: UserQueryDto): Promise<User[]> {
+    async findAllByCriteria(@Query() query: UserQueryDto): Promise<UserData> {
         let users = await this.userService.findAll();
 
         if (Object.keys(query).length > 0) {
@@ -79,8 +84,24 @@ export class UserController {
                     'id',
                 );
             }
+            if (query.handed) {
+                users = intersectionBy(
+                    users,
+                    await this.userService.findAllHandedOver(
+                        JSON.parse(query.handed),
+                    ),
+                    'id',
+                );
+            }
+            if (query.grades) {
+                users = intersectionBy(
+                    users,
+                    await this.userService.findAllByGrades(query.grades),
+                    'id',
+                );
+            }
         }
-        return users;
+        return { data: users, entries: users.length };
     }
 
     @Post()

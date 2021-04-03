@@ -4,13 +4,19 @@ import { UpdateProjectDto } from './dto/update-project.dto';
 import { Project } from './project.entity';
 import { ProjectService } from './project.service';
 
+interface ProjectData {
+    data: Project[];
+    entries: number;
+}
+
 @Controller('projects')
 export class ProjectController {
     constructor(private readonly projectService: ProjectService) {}
 
     @Get()
-    findAll(): Promise<Project[]> {
-        return this.projectService.findAll();
+    async findAll(): Promise<ProjectData> {
+        const projects = await this.projectService.findAll();
+        return { data: projects, entries: projects.length };
     }
 
     @Post()

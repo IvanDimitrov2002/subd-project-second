@@ -83,6 +83,31 @@ export class UserService {
         });
     }
 
+    async findAllHandedOver(handed: boolean): Promise<User[]> {
+        const users = await this.userRepository.find();
+        return handed
+            ? users.filter(
+                  (user) =>
+                      user.projects.filter((project) => project.defendDate)
+                          .length > 0,
+              )
+            : users.filter(
+                  (user) =>
+                      user.projects.filter((project) => !project.defendDate)
+                          .length > 0,
+              );
+    }
+
+    async findAllByGrades(grades: number): Promise<User[]> {
+        const users = await this.userRepository.find();
+        return users.filter(
+            (user) =>
+                user.projects.filter(
+                    (project) => project.grades.length == grades,
+                ).length > 0,
+        );
+    }
+
     async create(data: CreateUserDto) {
         const newUser = new User();
         const { projectsIds, ...rest } = data;
